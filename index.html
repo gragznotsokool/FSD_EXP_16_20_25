@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Budget Tracker - Real-Time</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Budget Tracker - Real-Time</h1>
+
+  <form id="transactionForm">
+    <input type="text" id="type" placeholder="Type (income/expense)" required>
+    <input type="number" id="amount" placeholder="Amount" required>
+    <button type="submit">Add Transaction</button>
+  </form>
+
+  <ul id="transactions"></ul>
+
+  <script>
+    const socket = io(); // connects to the same server
+
+    // Listen for updates from server
+    socket.on("updateTransactions", (data) => {
+      const ul = document.getElementById("transactions");
+      const li = document.createElement("li");
+      li.textContent = `Type: ${data.type}, Amount: ${data.amount}`;
+      ul.appendChild(li);
+    });
+
+    // Handle form submission
+    document.getElementById("transactionForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const type = document.getElementById("type").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+      socket.emit("newTransaction", { type, amount });
+
+      // Clear inputs
+      document.getElementById("type").value = "";
+      document.getElementById("amount").value = "";
+    });
+  </script>
+</body>
+</html>
